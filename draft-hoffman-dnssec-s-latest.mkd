@@ -301,7 +301,7 @@ A validator that only knows DNSSEC-M will not know how to hash
 "using the digest algorithm specified in the DS RR's Digest Type
 field" because it will not know the algorithm for DS-DIGEST-TBD.
 
-## Simultaneous Use of Both DNSSEC-M and DNSSEC-S
+## Simultaneous Use of Both DNSSEC-M and DNSSEC-S {#UsingBoth}
 
 An authoritative server that uses DNSSEC-S for authentication can also use DNSSEC-M
 if it wishes.
@@ -327,6 +327,20 @@ This scheme will make validators that use DNSSEC-S to be slightly slower because
 they need to perform one extra decoding per standby key, and possibly one extra SHA-256
 hash execution per comparison with certificates from the TLS server.
 
+## DoS Attacks on DNSSEC-S {#DoS}
+
+All TLS servers are susceptible to CPU-exhaustion attacks from attackers who can
+generate traffic that requires the server to do asymmetric computations. 
+Zones that use DNSSEC-S are as susceptible to these denial-of-service attacks as
+web servers that use HTTPS and mail servers that use SMTPS.
+TLS 1.3 will be less susceptible to such attacks than earlier versions of TLS,
+but some attacks are still possible.
+
+Note that DNSSEC-M with online signing of DNSSEC records are also susceptible
+to DoS attacks.
+This area has not been heavily studied, but it is possible that DNSSEC-S servers
+will be less susceptible to CPU exhaustion attacks than DNSSEC-M servers that
+use online signing.
 
 # Security Considerations
 
@@ -335,15 +349,19 @@ This section will clearly be much longer before the document is finished.
 Proposed additions are welcome.
 \*\*\*
 
+The security of DNSSEC-S is completely dependent on the ability of DNSSEC-S
+clients to correctly match the public keys in the TLS certificate messages with
+the values in the DNSSEC-S NS Labels.
+A DNSSEC-S client that mis-implements the rules in this protocol is capable of
+being fooled into validating answers that it should not.
+
 An authoritative server that supports both DNSSEC-S and DNSSEC-M, and sends
 DNSSEC-M records that cause the authoritative answers to not validate in
-DNSSEC-M, will likely have nondeterministic results when queried.
+DNSSEC-M, will likely have nondeterministic results when queried; see
+{{UsingBoth}}.
 
-The security of DNSSEC-S is dependent on the ability of DNSSEC-S clients to
-correctly match the public keys in the TLS certificate messages with the values
-in the DNSSEC-S NS Labels. A DNSSEC-S client that mis-implements the rules in
-this protocol will be capable of being fooled into validating answers that it
-should not.
+DNSSEC-S is susceptible to denial-of-service attacks that DNSSEC-M using offline
+signing is not; see {{DoS}}.
 
 # IANA Considerations {#ianacons}
 
