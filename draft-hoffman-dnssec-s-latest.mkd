@@ -128,8 +128,8 @@ The security of DNSSEC-S relies on keeping the TLS private key secret.
 Because of this, DNSSEC-S is not appropriate for DNSSEC-protected zones where
 the nameservers are run by multiple organizations that have different abilities
 to protect a private key. 
-As an obvious example, the DNS root is currently served by many hundreds of
-different organizations that run instances of the root zone. 
+As an obvious example, the DNS root is currently served by a dozen different
+organizations. 
 Because it is impossible to serve the current DNS using just DNSSEC-S, this
 document mandates that validating resolvers MUST support validating with
 DNSSEC-M if they also support validating with DNSSEC-S.
@@ -191,15 +191,19 @@ For DNSSEC-S, the values MUST be:
 * Digest Type -- DS-DIGEST-TBD
 * Digest -- The SHA-256 {{SHA256}} hash of the authenticating public key in the TLS certificate
 
+The display format is unchanged from Section 5.3 of {{RFC4034}}.
+
 ## Client Preparation Before Establishing a TLS Connection {#ClientPrep}
 
 The client validates the DS resource record set in the parent for a zone; if the resource
 record set does not validate, the client MUST NOT use DNSSEC-S to authenticate
 values in the zone.
 
-The client starts a dataset called the "DS hash set". Each member of the dataset consists
-of a hash value obtained from the DS records that have Digest Type DS-DIGEST-TBD.
-DS records with Digest Type other than DS-DIGEST-TBD MUST NOT be used to create the DS hash set.
+The client creates a data structure called the "DS hash set".
+Each member of the data structure consists of a hash value obtained from the DS
+records that have Digest Type DS-DIGEST-TBD.
+DS records with Digest Type other than DS-DIGEST-TBD MUST NOT be used to create
+the DS hash set.
 
 If the DS hash set is empty, the client MUST NOT attempt to establish a
 TLS connection.
@@ -238,7 +242,7 @@ Note that the Certificate message might contain one or more raw public keys
 (described in {{RFC7250}}.
 For each certificate in the Certificates message, the client hashes the
 public key in the certificate with SHA-256 and adds it to a
-dataset called the "certificate hash set".
+data structure called the "certificate hash set".
 
 The client then compares the the first element from the DS hash set to the
 elements in the certificate hash set.
